@@ -30,6 +30,7 @@ type resolveUserRes struct {
 	Username string `json:"username"`
 }
 
+// Creates a new Authorization by "authorizationCode" or "accessToken".
 func (a *Application) Auth (by string, value string) (auth *Authorization, err error) {
 	if by == "authorizationCode" {
 		data := createAccessTokenReq{
@@ -87,6 +88,7 @@ func (a *Application) Auth (by string, value string) (auth *Authorization, err e
 	}
 }
 
+// Resolves a user by either "username" or "userId".
 func (a *Application) ResolveUser (resolveBy string, value string) (result *resolveUserRes, err error) {
 	data := resolveUserReq{
 		ResolveBy: resolveBy,
