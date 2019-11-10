@@ -84,7 +84,7 @@ func (a *Application) Auth (by string, value string) (auth *Authorization, err e
 			AccessToken: value,
 		}, nil
 	} else {
-		return nil, errors.New("Unknown authorization method \"" + by + "\"")
+		panic("Unknown authorization method \"" + by + "\"")
 	}
 }
 
@@ -96,7 +96,7 @@ func (a *Application) ResolveUser (resolveBy string, value string) (result *reso
 	}
 
 	if data.ResolveBy != "username" && data.ResolveBy != "userId" {
-		return nil, errors.New("Cannot resolve by '" + data.ResolveBy + "'")
+		panic("Cannot resolve by '" + data.ResolveBy + "'")
 	}
 
 	serialized, err := json.Marshal(data)
