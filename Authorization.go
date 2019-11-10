@@ -6,11 +6,20 @@ import (
 	"errors"
 )
 
-type Authorization struct {
+// An authorization created by an Application
+type authorization struct {
 	Application *Application
 	AccessToken string
 }
 
+type tokenInfoRes struct {
+	Error string `json:"error"`
+	Scopes []string `json:"scopes"`
+	UserId string `json:"userId`
+	Expires string `json:"expires"`
+}
+
+// A home address
 type homeAddress struct {
 	Full string `json:"full"`
 	Line1 string `json:"line1"`
@@ -22,8 +31,9 @@ type homeAddress struct {
 	CountryCode string `json:"countryCode"`
 }
 
+// Profile information for a user
 type profileRes struct {
-	Error *string `json:"error"`
+	Error string `json:"error"`
 	UserId string `json:"userId"`
 	Username string `json:"username"`
 	Created string `json:"created"`
@@ -38,7 +48,46 @@ type profileRes struct {
 	}
 }
 
-func (a *Authorization) FetchProfile() (profile *profileRes, err error) {
+func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
+	auth := *a
+	app := *auth.Application
+
+	res, err := doRequest(Request{
+		Url: "https://api.metrafin.com/v1/token",
+		Method: "GET",
+		Data: &[]byte{},
+		Headers: &map[string]string{
+			"Authorization": app.PrivateToken + ":" + auth.AccessToken,
+		},
+	}, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	all, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var parsed tokenInfoRes
+
+	err = json.Unmarshal(all, &parsed)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if parsed.Error != "" {
+		return nil, errors.New(parsed.Error)
+	}
+
+	return &parsed, nil
+}
+
+// Get Profile information of user.
+func (a *authorization) FetchProfile() (profile *profileRes, err error) {
 	auth := *a
 	app := *auth.Application
 
@@ -69,8 +118,8 @@ func (a *Authorization) FetchProfile() (profile *profileRes, err error) {
 		return nil, err
 	}
 
-	if parsed.Error != nil {
-		return nil, errors.New(*parsed.Error)
+	if parsed.Error != "" {
+		return nil, errors.New(parsed.Error)
 	}
 
 	return &parsed, nil

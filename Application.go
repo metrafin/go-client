@@ -15,7 +15,7 @@ type createAccessTokenReq struct {
 }
 
 type createAccessTokenRes struct {
-	Error *string `json:"error"`
+	Error string `json:"error"`
 	AccessToken string `json:"accessToken"`
 }
 
@@ -25,13 +25,13 @@ type resolveUserReq struct {
 }
 
 type resolveUserRes struct {
-	error *string `json:"error"`
+	Error string `json:"error"`
 	UserId string `json:"userId"`
 	Username string `json:"username"`
 }
 
 // Creates a new Authorization by "authorizationCode" or "accessToken".
-func (a *Application) Auth (by string, value string) (auth *Authorization, err error) {
+func (a *Application) Auth (by string, value string) (auth *authorization, err error) {
 	if by == "authorizationCode" {
 		data := createAccessTokenReq{
 			AuthorizationCode: value,
@@ -70,16 +70,16 @@ func (a *Application) Auth (by string, value string) (auth *Authorization, err e
 			return nil, err
 		}
 
-		if parsed.Error != nil {
-			return nil, errors.New(*parsed.Error)
+		if parsed.Error != "" {
+			return nil, errors.New(parsed.Error)
 		}
 
-		return &Authorization{
+		return &authorization{
 			Application: a,
 			AccessToken: parsed.AccessToken,
 		}, nil
 	} else if by == "accessToken" {
-		return &Authorization{
+		return &authorization{
 			Application: a,
 			AccessToken: value,
 		}, nil
@@ -134,8 +134,8 @@ func (a *Application) ResolveUser (resolveBy string, value string) (result *reso
 		return nil, err
 	}
 
-	if res.error != nil {
-		return nil, errors.New(*res.error)
+	if res.Error != "" {
+		return nil, errors.New(res.Error)
 	} else {
 		return &res, nil
 	}
