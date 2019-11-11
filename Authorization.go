@@ -48,7 +48,7 @@ type profileRes struct {
 	}
 }
 
-// Get stats about authorization
+// FetchInfo retrieves stats about authorization.
 func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
 	auth := *a
 	app := *auth.application
@@ -87,7 +87,7 @@ func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
 	return &parsed, nil
 }
 
-// Get profile information of user
+// FetchProfile retrieves profile information of user.
 func (a *authorization) FetchProfile() (profile *profileRes, err error) {
 	auth := *a
 	app := *auth.application

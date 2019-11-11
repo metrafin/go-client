@@ -1,3 +1,4 @@
+// Package metrafin provides structured means for accessing the Metrafin Public API and authenticating Metrafin users.
 package metrafin
 
 import (
@@ -30,7 +31,7 @@ type resolveUserRes struct {
 	Username string `json:"username"`
 }
 
-// Create a new Authorization by "authorizationCode" or "accessToken"
+// Auth creates a new Authorization by "authorizationCode" or "accessToken".
 func (a *Application) Auth (by string, value string) (auth *authorization, err error) {
 	if by == "authorizationCode" {
 		data := createAccessTokenReq{
@@ -88,7 +89,7 @@ func (a *Application) Auth (by string, value string) (auth *authorization, err e
 	}
 }
 
-// Resolve a user by either "username" or "userId"
+// ResolveUser resolves a user by either "username" or "userId".
 func (a *Application) ResolveUser (resolveBy string, value string) (result *resolveUserRes, err error) {
 	data := resolveUserReq{
 		ResolveBy: resolveBy,
