@@ -2,9 +2,8 @@
 package metrafin
 
 import (
-	"errors"
-	"io/ioutil"
 	"encoding/json"
+	"errors"
 )
 
 type Application struct {
@@ -32,7 +31,7 @@ type resolveUserRes struct {
 }
 
 // Auth creates a new Authorization by "authorizationCode" or "accessToken".
-func (a *Application) Auth (by string, value string) (auth *authorization, err error) {
+func (a *Application) Auth (by string, value string) (auth *Authorization, err error) {
 	if by == "authorizationCode" {
 		data := createAccessTokenReq{
 			AuthorizationCode: value,
@@ -44,28 +43,16 @@ func (a *Application) Auth (by string, value string) (auth *authorization, err e
 			return nil, err
 		}
 
-		resp, err := doRequest(Request{
+		parsed := &createAccessTokenRes{}
+
+		err = doRequest(Request{
 			Url: "https://api.metrafin.com/v1/createAccessToken",
 			Method: "POST",
 			Data: &serialized,
 			Headers: &map[string]string{
 				"Authorization": (*a).PrivateToken,
 			},
-		}, nil)
-
-		if err != nil {
-			return nil, err
-		}
-
-		all, err := ioutil.ReadAll(resp.Body)
-
-		if err != nil {
-			return nil, err
-		}
-
-		var parsed createAccessTokenRes
-
-		err = json.Unmarshal(all, &parsed)
+		}, nil, parsed)
 
 		if err != nil {
 			return nil, err
@@ -75,13 +62,13 @@ func (a *Application) Auth (by string, value string) (auth *authorization, err e
 			return nil, errors.New(parsed.Error)
 		}
 
-		return &authorization{
-			Application: a,
+		return &Authorization{
+			application: a,
 			AccessToken: parsed.AccessToken,
 		}, nil
 	} else if by == "accessToken" {
-		return &authorization{
-			Application: a,
+		return &Authorization{
+			application: a,
 			AccessToken: value,
 		}, nil
 	} else {
@@ -106,38 +93,24 @@ func (a *Application) ResolveUser (resolveBy string, value string) (result *reso
 		return nil, err
 	}
 
-	resp, err := doRequest(Request{
+	parsed := &resolveUserRes{}
+
+	err = doRequest(Request{
 		Url: "https://api.metrafin.com/v1/resolveUser",
 		Method: "POST",
 		Data: &serialized,
 		Headers: &map[string]string{
 			"Authorization": (*a).PrivateToken,
 		},
-	}, nil)
-
-	defer resp.Body.Close()
+	}, nil, parsed)
 
 	if err != nil {
 		return nil, err
 	}
 
-	all, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, err
+	if parsed.Error != "" {
+		return nil, errors.New(parsed.Error)
 	}
 
-	var res resolveUserRes
-
-	err = json.Unmarshal(all, &res)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if res.Error != "" {
-		return nil, errors.New(res.Error)
-	} else {
-		return &res, nil
-	}
+	return parsed, nil
 }

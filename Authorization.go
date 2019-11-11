@@ -1,8 +1,6 @@
 package metrafin
 
 import (
-	"io/ioutil"
-	"encoding/json"
 	"errors"
 )
 
@@ -49,32 +47,20 @@ type profileRes struct {
 }
 
 // FetchInfo retrieves stats about authorization.
-func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
+func (a *Authorization) FetchInfo() (info *tokenInfoRes, err error) {
 	auth := *a
 	app := *auth.application
 
-	res, err := doRequest(Request{
+	parsed := &tokenInfoRes{}
+
+	err = doRequest(Request{
 		Url: "https://api.metrafin.com/v1/token",
 		Method: "GET",
 		Data: &[]byte{},
 		Headers: &map[string]string{
 			"Authorization": app.PrivateToken + ":" + auth.AccessToken,
 		},
-	}, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	all, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var parsed tokenInfoRes
-
-	err = json.Unmarshal(all, &parsed)
+	}, nil, parsed)
 
 	if err != nil {
 		return nil, err
@@ -84,36 +70,24 @@ func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
 		return nil, errors.New(parsed.Error)
 	}
 
-	return &parsed, nil
+	return parsed, nil
 }
 
 // FetchProfile retrieves profile information of user.
-func (a *authorization) FetchProfile() (profile *profileRes, err error) {
+func (a *Authorization) FetchProfile() (profile *profileRes, err error) {
 	auth := *a
 	app := *auth.application
 
-	res, err := doRequest(Request{
+	parsed := &profileRes{}
+
+	err = doRequest(Request{
 		Url: "https://api.metrafin.com/v1/user/profile",
 		Method: "GET",
 		Data: &[]byte{},
 		Headers: &map[string]string{
 			"Authorization": app.PrivateToken + ":" + auth.AccessToken,
 		},
-	}, nil)
-
-	if err != nil {
-		return nil, err
-	}
-
-	all, err := ioutil.ReadAll(res.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var parsed profileRes
-
-	err = json.Unmarshal(all, &parsed)
+	}, nil, parsed)
 
 	if err != nil {
 		return nil, err
@@ -123,5 +97,5 @@ func (a *authorization) FetchProfile() (profile *profileRes, err error) {
 		return nil, errors.New(parsed.Error)
 	}
 
-	return &parsed, nil
+	return parsed, nil
 }

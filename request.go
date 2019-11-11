@@ -3,6 +3,8 @@ package metrafin
 import (
 	"net/http"
 	"bytes"
+	"io/ioutil"
+	"encoding/json"
 )
 
 type Request struct {
@@ -12,11 +14,11 @@ type Request struct {
 	Headers *map[string]string
 }
 
-func doRequest(request Request, client *http.Client) (resp *http.Response, error error) {
+func doRequest(request Request, client *http.Client, output interface{}) (error error) {
 	innerReq, err := http.NewRequest(request.Method, request.Url, bytes.NewReader(*request.Data))
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if request.Headers != nil {
@@ -31,11 +33,25 @@ func doRequest(request Request, client *http.Client) (resp *http.Response, error
 		client = &http.Client{}
 	}
 
-	resp, err = client.Do(innerReq)
+	resp, err := client.Do(innerReq)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return resp, nil
+	defer resp.Body.Close()
+
+	all, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(all, &output)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
