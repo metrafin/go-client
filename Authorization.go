@@ -7,8 +7,8 @@ import (
 )
 
 // An authorization created by an Application
-type authorization struct {
-	Application *Application
+type Authorization struct {
+	application *Application
 	AccessToken string
 }
 
@@ -48,9 +48,10 @@ type profileRes struct {
 	}
 }
 
+// Get stats about authorization
 func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
 	auth := *a
-	app := *auth.Application
+	app := *auth.application
 
 	res, err := doRequest(Request{
 		Url: "https://api.metrafin.com/v1/token",
@@ -86,10 +87,10 @@ func (a *authorization) FetchInfo() (info *tokenInfoRes, err error) {
 	return &parsed, nil
 }
 
-// Get Profile information of user.
+// Get profile information of user
 func (a *authorization) FetchProfile() (profile *profileRes, err error) {
 	auth := *a
-	app := *auth.Application
+	app := *auth.application
 
 	res, err := doRequest(Request{
 		Url: "https://api.metrafin.com/v1/user/profile",
