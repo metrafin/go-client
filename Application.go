@@ -15,23 +15,23 @@ type createAccessTokenReq struct {
 }
 
 type createAccessTokenRes struct {
-	Error string `json:"error"`
+	Error       string `json:"error"`
 	AccessToken string `json:"accessToken"`
 }
 
 type resolveUserReq struct {
 	ResolveBy string `json:"resolveBy"`
-	Value string `json:"value"`
+	Value     string `json:"value"`
 }
 
 type resolveUserRes struct {
-	Error string `json:"error"`
-	UserId string `json:"userId"`
+	Error    string `json:"error"`
+	UserId   string `json:"userId"`
 	Username string `json:"username"`
 }
 
 // Auth creates a new Authorization by "authorizationCode" or "accessToken".
-func (a *Application) Auth (by string, value string) (auth *Authorization, err error) {
+func (a *Application) Auth(by string, value string) (auth *Authorization, err error) {
 	if by == "authorizationCode" {
 		data := createAccessTokenReq{
 			AuthorizationCode: value,
@@ -46,9 +46,9 @@ func (a *Application) Auth (by string, value string) (auth *Authorization, err e
 		parsed := &createAccessTokenRes{}
 
 		err = doRequest(Request{
-			Url: "https://api.metrafin.com/v1/createAccessToken",
+			Url:    "https://api.metrafin.com/v1/createAccessToken",
 			Method: "POST",
-			Data: &serialized,
+			Data:   &serialized,
 			Headers: &map[string]string{
 				"Authorization": (*a).PrivateToken,
 			},
@@ -77,10 +77,10 @@ func (a *Application) Auth (by string, value string) (auth *Authorization, err e
 }
 
 // ResolveUser resolves a user by either "username" or "userId".
-func (a *Application) ResolveUser (resolveBy string, value string) (result *resolveUserRes, err error) {
+func (a *Application) ResolveUser(resolveBy string, value string) (result *resolveUserRes, err error) {
 	data := resolveUserReq{
 		ResolveBy: resolveBy,
-		Value: value,
+		Value:     value,
 	}
 
 	if data.ResolveBy != "username" && data.ResolveBy != "userId" {
@@ -96,9 +96,9 @@ func (a *Application) ResolveUser (resolveBy string, value string) (result *reso
 	parsed := &resolveUserRes{}
 
 	err = doRequest(Request{
-		Url: "https://api.metrafin.com/v1/resolveUser",
+		Url:    "https://api.metrafin.com/v1/resolveUser",
 		Method: "POST",
-		Data: &serialized,
+		Data:   &serialized,
 		Headers: &map[string]string{
 			"Authorization": (*a).PrivateToken,
 		},

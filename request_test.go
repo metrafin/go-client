@@ -4,22 +4,24 @@ import (
 	"testing"
 )
 
-func TestRequest (t *testing.T) {
-	resp, err := doRequest(Request{
-		Url: "https://api.metrafin.com",
+type errorRes struct {
+	Error string `json:"error"`
+}
+
+func TestRequest(t *testing.T) {
+	out := errorRes{}
+
+	err := doRequest(Request{
+		Url:    "https://api.metrafin.com",
 		Method: "GET",
-		Data: &[]byte{},
+		Data:   &[]byte{},
 		Headers: &map[string]string{
 			"Host": "api.metrafin.com",
 		},
-	}, nil)
+	}, nil, &out)
 
 	if err != nil {
 		t.Error(err)
-		return
-	}
-
-	if resp.StatusCode != 0 {
 		return
 	}
 }

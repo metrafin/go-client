@@ -1,16 +1,17 @@
 package metrafin
 
 import (
-	"net/http"
 	"bytes"
-	"io/ioutil"
 	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"time"
 )
 
 type Request struct {
-	Url string
-	Method string
-	Data *[]byte
+	Url     string
+	Method  string
+	Data    *[]byte
 	Headers *map[string]string
 }
 
@@ -32,6 +33,8 @@ func doRequest(request Request, client *http.Client, output interface{}) (error 
 	if client == nil {
 		client = &http.Client{}
 	}
+
+	client.Timeout = time.Millisecond * 6000
 
 	resp, err := client.Do(innerReq)
 
