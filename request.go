@@ -8,15 +8,15 @@ import (
 	"time"
 )
 
-type Request struct {
-	Url     string
+type request struct {
+	URL     string
 	Method  string
 	Data    *[]byte
 	Headers *map[string]string
 }
 
-func doRequest(request Request, client *http.Client, output interface{}) (error error) {
-	innerReq, err := http.NewRequest(request.Method, request.Url, bytes.NewReader(*request.Data))
+func doRequest(request request, client *http.Client, output interface{}) (error error) {
+	innerReq, err := http.NewRequest(request.Method, request.URL, bytes.NewReader(*request.Data))
 
 	if err != nil {
 		return err

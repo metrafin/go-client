@@ -11,8 +11,8 @@ type errorRes struct {
 func TestRequest(t *testing.T) {
 	out := errorRes{}
 
-	err := doRequest(Request{
-		Url:    "https://api.metrafin.com",
+	err := doRequest(request{
+		URL:    "https://api.metrafin.com",
 		Method: "GET",
 		Data:   &[]byte{},
 		Headers: &map[string]string{

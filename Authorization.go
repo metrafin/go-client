@@ -4,16 +4,17 @@ import (
 	"errors"
 )
 
-// An authorization created by an Application
+// Authorization represents an authorization created by an Application
 type Authorization struct {
 	application *Application
 	AccessToken string
 }
 
-type tokenInfoRes struct {
+// TokenInfoRes represents responses from a documented endpoint: https://github.com/metrafin/documentation#get-v1token
+type TokenInfoRes struct {
 	Error   string   `json:"error"`
 	Scopes  []string `json:"scopes"`
-	UserId  string   `json:"userId"`
+	UserID  string   `json:"userId"`
 	Expires string   `json:"expires"`
 }
 
@@ -29,10 +30,10 @@ type homeAddress struct {
 	CountryCode            string `json:"countryCode"`
 }
 
-// Profile information for a user
-type profileRes struct {
+// ProfileRes represents responses from a documented endpoint: https://github.com/metrafin/documentation#get-v1userprofile
+type ProfileRes struct {
 	Error    string `json:"error"`
-	UserId   string `json:"userId"`
+	UserID   string `json:"userId"`
 	Username string `json:"username"`
 	Created  string `json:"created"`
 	Verified struct {
@@ -47,14 +48,14 @@ type profileRes struct {
 }
 
 // FetchInfo retrieves stats about authorization.
-func (a *Authorization) FetchInfo() (info *tokenInfoRes, err error) {
+func (a *Authorization) FetchInfo() (info *TokenInfoRes, err error) {
 	auth := *a
 	app := *auth.application
 
-	parsed := &tokenInfoRes{}
+	parsed := &TokenInfoRes{}
 
-	err = doRequest(Request{
-		Url:    "https://api.metrafin.com/v1/token",
+	err = doRequest(request{
+		URL:    "https://api.metrafin.com/v1/token",
 		Method: "GET",
 		Data:   &[]byte{},
 		Headers: &map[string]string{
@@ -74,14 +75,14 @@ func (a *Authorization) FetchInfo() (info *tokenInfoRes, err error) {
 }
 
 // FetchProfile retrieves profile information of user.
-func (a *Authorization) FetchProfile() (profile *profileRes, err error) {
+func (a *Authorization) FetchProfile() (profile *ProfileRes, err error) {
 	auth := *a
 	app := *auth.application
 
-	parsed := &profileRes{}
+	parsed := &ProfileRes{}
 
-	err = doRequest(Request{
-		Url:    "https://api.metrafin.com/v1/user/profile",
+	err = doRequest(request{
+		URL:    "https://api.metrafin.com/v1/user/profile",
 		Method: "GET",
 		Data:   &[]byte{},
 		Headers: &map[string]string{

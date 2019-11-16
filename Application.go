@@ -6,6 +6,7 @@ import (
 	"errors"
 )
 
+// An Application for the Metrafin API
 type Application struct {
 	PrivateToken string
 }
@@ -24,9 +25,10 @@ type resolveUserReq struct {
 	Value     string `json:"value"`
 }
 
-type resolveUserRes struct {
+// ResolveUserRes represents responses from a documented endpoint: https://github.com/metrafin/documentation#post-v1resolveuser
+type ResolveUserRes struct {
 	Error    string `json:"error"`
-	UserId   string `json:"userId"`
+	UserID   string `json:"userId"`
 	Username string `json:"username"`
 }
 
@@ -45,8 +47,8 @@ func (a *Application) Auth(by string, value string) (auth *Authorization, err er
 
 		parsed := &createAccessTokenRes{}
 
-		err = doRequest(Request{
-			Url:    "https://api.metrafin.com/v1/createAccessToken",
+		err = doRequest(request{
+			URL:    "https://api.metrafin.com/v1/createAccessToken",
 			Method: "POST",
 			Data:   &serialized,
 			Headers: &map[string]string{
@@ -77,7 +79,7 @@ func (a *Application) Auth(by string, value string) (auth *Authorization, err er
 }
 
 // ResolveUser resolves a user by either "username" or "userId".
-func (a *Application) ResolveUser(resolveBy string, value string) (result *resolveUserRes, err error) {
+func (a *Application) ResolveUser(resolveBy string, value string) (result *ResolveUserRes, err error) {
 	data := resolveUserReq{
 		ResolveBy: resolveBy,
 		Value:     value,
@@ -93,10 +95,10 @@ func (a *Application) ResolveUser(resolveBy string, value string) (result *resol
 		return nil, err
 	}
 
-	parsed := &resolveUserRes{}
+	parsed := &ResolveUserRes{}
 
-	err = doRequest(Request{
-		Url:    "https://api.metrafin.com/v1/resolveUser",
+	err = doRequest(request{
+		URL:    "https://api.metrafin.com/v1/resolveUser",
 		Method: "POST",
 		Data:   &serialized,
 		Headers: &map[string]string{
